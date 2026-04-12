@@ -1,0 +1,1639 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Back 2 Belong – Campus Lost & Found</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:       #191D23;
+  --teal-dk:   #57707A;
+  --teal-md:   #7E919F;
+  --slate:     #979DAB;
+  --blush:     #C5BAC4;
+  --off-white: #DEDCDC;
+  --bg:        #f0eef0;
+  --card-bg:   #ffffff;
+  --border:    #C5BAC4;
+  --muted:     #57707A;
+  --lost-clr:  #8B3A3A;
+  --found-clr: #2E6B4F;
+  --shadow:    0 2px 20px rgba(25,29,35,0.08);
+  --shadow-lg: 0 8px 40px rgba(25,29,35,0.14);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+@keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes badgePop { 0% { transform: scale(0); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+
+header {
+  position: sticky; top: 0; z-index: 200;
+  height: 64px;
+  background: rgba(25,29,35,0.96);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(151,157,171,0.2);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem;
+  animation: slideDown 0.55s cubic-bezier(.22,1,.36,1) both;
+}
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--off-white); }
+.logo-mark {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--teal-dk) 0%, var(--teal-md) 100%);
+  display: flex; align-items: center; justify-content: center;
+  position: relative; overflow: hidden;
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1); flex-shrink: 0;
+}
+.logo:hover .logo-mark { transform: rotate(-8deg) scale(1.1); }
+.logo-mark span { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 12px; color: #fff; letter-spacing: -0.5px; position: relative; z-index: 1; }
+.logo-mark::after { content: ''; position: absolute; bottom: -5px; right: -5px; width: 16px; height: 16px; background: var(--blush); border-radius: 50%; animation: float 3s ease-in-out infinite; }
+.logo-text { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--off-white); line-height: 1.1; }
+.logo-text small { display: block; font-size: 0.68rem; font-weight: 400; color: var(--slate); font-family: 'DM Sans', sans-serif; letter-spacing: 0.04em; text-transform: uppercase; }
+nav { display: flex; align-items: center; gap: 8px; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.22s cubic-bezier(.22,1,.36,1); text-decoration: none; white-space: nowrap; }
+.btn-ghost { background: transparent; color: var(--off-white); border: 1px solid rgba(151,157,171,0.35); }
+.btn-ghost:hover { background: rgba(126,145,159,0.15); border-color: var(--slate); }
+.btn-teal { background: var(--teal-dk); color: #fff; }
+.btn-teal:hover { background: var(--teal-md); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(87,112,122,0.4); }
+.btn-primary { background: var(--off-white); color: var(--ink); font-weight: 600; }
+.btn-primary:hover { background: var(--blush); transform: translateY(-1px); }
+#authArea { display: flex; align-items: center; gap: 8px; }
+#userInfo { display: none; align-items: center; gap: 10px; color: var(--off-white); font-size: 0.85rem; }
+#userInfo .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--teal-dk); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; color: #fff; }
+
+.hero { position: relative; z-index: 1; padding: 72px 2rem 56px; text-align: center; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(87,112,122,0.18) 0%, transparent 65%), radial-gradient(ellipse 40% 30% at 20% 80%, rgba(197,186,196,0.12) 0%, transparent 60%); }
+.hero-bg::after { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(126,145,159,0.1) 0%, transparent 70%); animation: float 6s ease-in-out infinite; }
+.hero-tag { display: inline-flex; align-items: center; gap: 7px; background: rgba(25,29,35,0.06); border: 1px solid var(--border); border-radius: 50px; padding: 6px 16px; font-size: 0.76rem; font-weight: 500; color: var(--teal-dk); margin-bottom: 24px; letter-spacing: 0.03em; text-transform: uppercase; animation: fadeUp 0.5s 0.1s both; }
+.hero-tag .dot { width: 6px; height: 6px; background: var(--teal-dk); border-radius: 50%; animation: pulse 2s infinite; }
+.hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 5vw, 3.8rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.03em; color: var(--ink); animation: fadeUp 0.6s 0.2s both; }
+.hero h1 .grad { background: linear-gradient(135deg, var(--teal-dk) 0%, var(--teal-md) 50%, var(--blush) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero p { margin: 18px auto 0; max-width: 460px; font-size: 1.05rem; color: var(--muted); line-height: 1.7; animation: fadeUp 0.6s 0.3s both; }
+.hero-stats { display: flex; justify-content: center; gap: 40px; margin: 36px auto 0; animation: fadeUp 0.6s 0.4s both; }
+.stat { text-align: center; }
+.stat-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--teal-dk); line-height: 1; }
+.stat-label { font-size: 0.75rem; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+.mode-toggle { display: flex; justify-content: center; margin: 40px auto 0; animation: fadeUp 0.6s 0.45s both; }
+.toggle-wrap { display: flex; background: var(--ink); border-radius: 50px; padding: 4px; gap: 4px; }
+.mode-btn { padding: 11px 32px; border-radius: 50px; border: none; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; transition: all 0.3s cubic-bezier(.34,1.56,.64,1); color: var(--slate); background: transparent; letter-spacing: 0.02em; }
+.mode-btn.active-lost { background: var(--lost-clr); color: #fff; box-shadow: 0 4px 16px rgba(139,58,58,0.4); }
+.mode-btn.active-found { background: var(--found-clr); color: #fff; box-shadow: 0 4px 16px rgba(46,107,79,0.4); }
+.mode-btn:not(.active-lost):not(.active-found):hover { color: var(--off-white); }
+
+.search-section { position: relative; z-index: 1; padding: 32px 2rem 0; max-width: 900px; margin: 0 auto; animation: fadeUp 0.6s 0.5s both; }
+.search-bar { display: flex; gap: 10px; align-items: center; background: var(--card-bg); border: 1.5px solid var(--border); border-radius: 50px; padding: 6px 6px 6px 22px; box-shadow: var(--shadow); transition: box-shadow 0.2s, border-color 0.2s; }
+.search-bar:focus-within { border-color: var(--teal-dk); box-shadow: 0 0 0 3px rgba(87,112,122,0.15), var(--shadow); }
+.search-bar input { flex: 1; border: none; outline: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--ink); }
+.search-bar input::placeholder { color: var(--slate); }
+.search-icon { color: var(--slate); font-size: 1.1rem; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; padding: 0 4px; }
+.filter-select { padding: 7px 14px; border-radius: 50px; border: 1.5px solid var(--border); background: var(--card-bg); color: var(--ink); font-family: 'DM Sans', sans-serif; font-size: 0.83rem; cursor: pointer; outline: none; transition: border-color 0.2s, background 0.2s; -webkit-appearance: none; appearance: none; padding-right: 28px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2357707A' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+.filter-select:focus { border-color: var(--teal-dk); }
+.filter-tag { padding: 7px 16px; border-radius: 50px; cursor: pointer; border: 1.5px solid var(--border); background: var(--card-bg); font-size: 0.83rem; color: var(--muted); font-weight: 500; transition: all 0.2s; }
+.filter-tag:hover, .filter-tag.active { background: var(--ink); color: var(--off-white); border-color: var(--ink); }
+
+.main { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 40px 2rem 80px; }
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.section-title .pill { font-size: 0.72rem; font-family: 'DM Sans', sans-serif; background: var(--ink); color: var(--off-white); padding: 2px 10px; border-radius: 50px; font-weight: 500; }
+.see-all { font-size: 0.82rem; color: var(--teal-dk); cursor: pointer; font-weight: 500; }
+.see-all:hover { color: var(--teal-md); }
+
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s; cursor: pointer; animation: scaleIn 0.4s both; }
+.card:hover { transform: translateY(-6px) scale(1.01); box-shadow: var(--shadow-lg); }
+.card-img { width: 100%; height: 170px; background: linear-gradient(135deg, var(--off-white) 0%, var(--blush) 100%); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
+.card:hover .card-img img { transform: scale(1.05); }
+.card-img .placeholder-icon { font-size: 2.5rem; opacity: 0.4; }
+.card-status { position: absolute; top: 10px; left: 10px; padding: 4px 12px; border-radius: 50px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; backdrop-filter: blur(8px); }
+.status-lost { background: rgba(139,58,58,0.9); color: #fff; }
+.status-found { background: rgba(46,107,79,0.9); color: #fff; }
+.card-actions-top { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; }
+.card-icon-btn { width: 30px; height: 30px; border-radius: 50%; border: none; background: rgba(25,29,35,0.55); backdrop-filter: blur(6px); color: #fff; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s; }
+.card-icon-btn:hover { background: rgba(25,29,35,0.85); transform: scale(1.1); }
+.card-icon-btn.bookmarked { background: var(--teal-dk); }
+.card-expiry { position: absolute; bottom: 8px; right: 8px; padding: 3px 8px; border-radius: 50px; background: rgba(25,29,35,0.7); backdrop-filter: blur(6px); font-size: 0.65rem; color: var(--blush); font-weight: 500; }
+.card-body { padding: 16px; }
+.card-cat { font-size: 0.7rem; color: var(--teal-dk); font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+.card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.98rem; color: var(--ink); line-height: 1.3; margin-bottom: 6px; }
+.card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.card-meta { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.meta-chip { display: flex; align-items: center; gap: 4px; font-size: 0.72rem; color: var(--muted); }
+.meta-chip svg { width: 12px; height: 12px; }
+.card-footer { padding: 12px 16px; border-top: 1px solid var(--off-white); display: flex; align-items: center; justify-content: space-between; }
+.card-code { font-family: monospace; font-size: 0.75rem; color: var(--slate); background: var(--off-white); padding: 3px 8px; border-radius: 6px; letter-spacing: 0.05em; }
+.card-contact-btn { padding: 6px 14px; border-radius: 50px; border: none; background: var(--ink); color: var(--off-white); font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+.card-contact-btn:hover { background: var(--teal-dk); transform: scale(1.05); }
+.match-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 50px; font-size: 0.68rem; background: rgba(87,112,122,0.12); color: var(--teal-dk); font-weight: 600; margin-top: 6px; animation: badgePop 0.4s cubic-bezier(.34,1.56,.64,1) both; }
+.skeleton { background: linear-gradient(90deg, var(--off-white) 25%, var(--blush) 50%, var(--off-white) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+
+.trending-strip { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+.trending-strip::-webkit-scrollbar { display: none; }
+.trending-chip { display: flex; align-items: center; gap: 6px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 50px; padding: 8px 16px; white-space: nowrap; cursor: pointer; font-size: 0.82rem; color: var(--ink); transition: all 0.2s; flex-shrink: 0; }
+.trending-chip:hover { background: var(--ink); color: var(--off-white); border-color: var(--ink); }
+.trending-chip .rank { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.75rem; color: var(--teal-dk); }
+
+.overlay { position: fixed; inset: 0; z-index: 300; background: rgba(25,29,35,0.7); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+.overlay.open { display: flex; animation: fadeIn 0.25s both; }
+.modal { background: var(--card-bg); border-radius: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(25,29,35,0.25); animation: scaleIn 0.3s cubic-bezier(.34,1.56,.64,1) both; scrollbar-width: thin; scrollbar-color: var(--blush) transparent; }
+.modal-header { position: sticky; top: 0; z-index: 1; background: var(--card-bg); padding: 22px 24px 16px; border-bottom: 1px solid var(--off-white); display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; }
+.modal-close { width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--off-white); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.2s; color: var(--ink); }
+.modal-close:hover { background: var(--blush); transform: rotate(90deg); }
+.modal-body { padding: 24px; }
+
+.form-group { margin-bottom: 18px; }
+.form-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--ink); margin-bottom: 6px; letter-spacing: 0.02em; }
+.form-label span { color: var(--teal-dk); }
+.form-input, .form-select, .form-textarea { width: 100%; padding: 11px 16px; border-radius: 12px; border: 1.5px solid var(--border); outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--ink); background: #fff; transition: border-color 0.2s, box-shadow 0.2s; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--teal-dk); box-shadow: 0 0 0 3px rgba(87,112,122,0.14); }
+.form-textarea { resize: vertical; min-height: 90px; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.upload-zone { border: 2px dashed var(--border); border-radius: 14px; padding: 28px; text-align: center; cursor: pointer; transition: all 0.25s; background: var(--bg); }
+.upload-zone:hover { border-color: var(--teal-dk); background: rgba(87,112,122,0.04); }
+.upload-zone.drag-over { border-color: var(--teal-dk); background: rgba(87,112,122,0.08); transform: scale(0.99); }
+.upload-zone p { font-size: 0.85rem; color: var(--muted); margin-top: 8px; }
+.upload-zone .upload-icon { font-size: 2rem; }
+#imagePreview { width: 100%; max-height: 180px; object-fit: cover; border-radius: 10px; margin-top: 10px; display: none; animation: scaleIn 0.3s both; }
+.type-toggle-row { display: flex; gap: 8px; margin-bottom: 20px; }
+.type-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid var(--border); cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; background: #fff; transition: all 0.22s; color: var(--slate); }
+.type-btn.active-lost { border-color: var(--lost-clr); color: var(--lost-clr); background: rgba(139,58,58,0.06); }
+.type-btn.active-found { border-color: var(--found-clr); color: var(--found-clr); background: rgba(46,107,79,0.06); }
+.auth-tabs { display: flex; gap: 0; margin-bottom: 24px; background: var(--off-white); border-radius: 12px; padding: 4px; }
+.auth-tab { flex: 1; padding: 9px; border-radius: 10px; border: none; cursor: pointer; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; background: transparent; color: var(--muted); transition: all 0.2s; }
+.auth-tab.active { background: var(--ink); color: var(--off-white); }
+
+.detail-img { width: 100%; max-height: 240px; object-fit: cover; border-radius: 14px; margin-bottom: 20px; }
+.detail-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+.detail-badge { padding: 5px 14px; border-radius: 50px; font-size: 0.78rem; font-weight: 600; }
+.detail-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; margin-bottom: 8px; color: var(--ink); }
+.detail-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.detail-item { background: var(--off-white); border-radius: 10px; padding: 10px 14px; }
+.detail-item-label { font-size: 0.7rem; color: var(--slate); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.detail-item-val { font-size: 0.9rem; color: var(--ink); font-weight: 600; margin-top: 2px; }
+.detail-owner-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.detail-owner-actions .btn { padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; }
+.contact-form { margin-top: 20px; border-top: 1px solid var(--off-white); padding-top: 20px; }
+.contact-form h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 14px; font-size: 0.95rem; }
+.similar-section { margin-top: 20px; border-top: 1px solid var(--off-white); padding-top: 20px; }
+.similar-section h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 12px; font-size: 0.95rem; }
+.similar-list { display: flex; flex-direction: column; gap: 8px; }
+.similar-item { display: flex; gap: 10px; align-items: center; background: var(--off-white); border-radius: 10px; padding: 10px; cursor: pointer; transition: background 0.2s; }
+.similar-item:hover { background: var(--blush); }
+.similar-thumb { width: 44px; height: 44px; border-radius: 8px; overflow: hidden; background: var(--blush); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+.similar-info { flex: 1; min-width: 0; }
+.similar-title { font-weight: 600; font-size: 0.85rem; color: var(--ink); }
+.similar-loc { font-size: 0.75rem; color: var(--muted); }
+.claim-section { margin-top: 20px; border-top: 1px solid var(--off-white); padding-top: 20px; }
+.claim-section h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 12px; font-size: 0.95rem; }
+.claim-row { display: flex; gap: 8px; }
+.claim-row .form-input { border-radius: 12px; text-transform: uppercase; letter-spacing: 0.1em; }
+
+.toast-wrap { position: fixed; bottom: 24px; right: 24px; z-index: 500; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast { padding: 12px 20px; border-radius: 12px; font-size: 0.86rem; font-weight: 500; color: #fff; box-shadow: 0 8px 24px rgba(25,29,35,0.2); animation: fadeUp 0.35s cubic-bezier(.34,1.56,.64,1) both; pointer-events: auto; max-width: 300px; }
+.toast-success { background: var(--found-clr); }
+.toast-error { background: var(--lost-clr); }
+.toast-info { background: var(--teal-dk); }
+.toast.removing { animation: fadeIn 0.3s reverse both; }
+
+.fab { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 150; display: flex; gap: 10px; animation: fadeUp 0.5s 0.8s both; }
+.fab-btn { display: flex; align-items: center; gap: 8px; padding: 14px 26px; border-radius: 50px; border: none; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; cursor: pointer; box-shadow: 0 8px 28px rgba(25,29,35,0.25); transition: all 0.3s cubic-bezier(.34,1.56,.64,1); white-space: nowrap; }
+.fab-btn:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 14px 36px rgba(25,29,35,0.3); }
+.fab-lost { background: var(--lost-clr); color: #fff; }
+.fab-found { background: var(--found-clr); color: #fff; }
+
+.empty-state { text-align: center; padding: 60px 20px; animation: fadeUp 0.5s both; }
+.empty-state .empty-icon { font-size: 3.5rem; margin-bottom: 16px; opacity: 0.5; animation: float 3s ease-in-out infinite; }
+.empty-state h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--ink); margin-bottom: 8px; }
+.empty-state p { font-size: 0.88rem; color: var(--muted); }
+
+.spinner { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--off-white); border-top-color: var(--teal-dk); animation: spin 0.8s linear infinite; margin: 40px auto; }
+
+.notif-panel { position: fixed; top: 64px; right: 0; bottom: 0; width: 320px; background: var(--card-bg); border-left: 1px solid var(--border); z-index: 150; overflow-y: auto; transform: translateX(100%); transition: transform 0.3s cubic-bezier(.22,1,.36,1); box-shadow: -8px 0 32px rgba(25,29,35,0.1); }
+.notif-panel.open { transform: translateX(0); }
+.notif-header { padding: 20px; border-bottom: 1px solid var(--off-white); }
+.notif-header h3 { font-family: 'Syne', sans-serif; font-weight: 700; }
+.notif-item { padding: 14px 20px; border-bottom: 1px solid var(--off-white); cursor: pointer; transition: background 0.2s; }
+.notif-item:hover { background: var(--off-white); }
+.notif-item.unread { background: rgba(87,112,122,0.05); }
+.notif-item .notif-title { font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+.notif-item .notif-time { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal-dk); display: inline-block; margin-left: 6px; animation: pulse 2s infinite; }
+
+@media (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .card-img { height: 200px; }
+  .card-body { padding: 12px; }
+  .card-title { font-size: 0.88rem; }
+  .card-desc { font-size: 0.78rem; }
+  .card-footer { padding: 10px 12px; }
+  .detail-grid { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .hero-stats { gap: 20px; }
+  .hero h1 { font-size: 1.8rem; }
+  .hero p { font-size: 0.92rem; }
+  .mode-btn { padding: 9px 18px; font-size: 0.8rem; }
+  .fab { bottom: 16px; gap: 6px; left: 50%; transform: translateX(-50); }
+  .fab-btn { padding: 11px 14px; font-size: 0.76rem; }
+  .notif-panel { width: 100%; }
+  .modal { border-radius: 16px; max-height: 95vh; }
+  .search-bar { padding: 5px 5px 5px 14px; }
+  .filters { gap: 6px; }
+  .filter-select { font-size: 0.78rem; padding: 6px 10px; }
+}
+
+@media (max-width: 640px) {
+  #hamburgerBtn { display:flex !important; }
+  nav .btn-ghost { display: none; }
+  nav #authArea .btn-ghost:first-child { display: none; }
+  header { padding: 0 1rem; }
+  .logo-text small { display: none; }
+
+  .main { padding: 20px 0.75rem 100px; }
+  .search-section { padding: 20px 0.75rem 0; }
+  .hero { padding: 36px 1rem 32px; }
+  .hero-stats { gap: 16px; flex-wrap: wrap; justify-content: center; }
+  .stat-num { font-size: 1.3rem; }
+  .fab { flex-direction: column; align-items: center; gap: 8px; bottom: 20px; }
+.fab-btn { width: 180px; justify-content: center; padding: 13px 20px; }
+}
+
+@media (max-width: 480px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .card-img { height: 190px; }
+  .card-cat { font-size: 0.65rem; }
+  .card-title { font-size: 0.82rem; }
+  .card-desc { display: none; }
+  .card-meta { display: none; }
+  .fab-btn { padding: 10px 13px; font-size: 0.74rem; }
+  .hero h1 { font-size: 1.5rem; }
+  .mode-btn { padding: 8px 14px; font-size: 0.75rem; }
+  .modal { margin: 0; border-radius: 20px 20px 0 0; max-height: 92vh; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; }
+  .overlay { align-items: flex-end; padding: 0; }
+  .chat-panel { height: 90vh; border-radius: 20px 20px 0 0; }
+}
+
+body.dark { --ink: #DEDCDC; --paper: #191D23; --cream: #1e2329; --card-bg: #22282f; --border: #57707A; --muted: #979DAB; --bg: #161a1f; }
+body.dark header { background: rgba(25,29,35,0.98); }
+body.dark .card { background: #22282f; border-color: #2e3740; }
+body.dark .modal { background: #22282f; }
+body.dark .search-bar { background: #22282f; border-color: #57707A; }
+body.dark .search-bar input { background: transparent; color: #DEDCDC; }
+body.dark .form-input, body.dark .form-select, body.dark .form-textarea { background: #1a1f26; color: #DEDCDC; border-color: #57707A; }
+body.dark .filter-select { background: #22282f; color: #DEDCDC; }
+body.dark .trending-chip { background: #22282f; border-color: #57707A; color: #DEDCDC; }
+body.dark .card-code { background: #1a1f26; color: #979DAB; }
+body.dark .detail-item { background: #1a1f26; }
+body.dark .auth-tabs { background: #1a1f26; }
+body.dark .similar-item { background: #1a1f26; }
+
+/* ══ CHAT STYLES ══ */
+.chat-panel { max-width: 480px; height: 80vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; }
+.chat-list { flex: 1; overflow-y: auto; padding: 12px; }
+.chat-list-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer; border: 1px solid var(--border); margin-bottom: 8px; background: var(--card-bg); transition: background 0.2s; }
+.chat-list-item:hover { background: var(--off-white); }
+.chat-avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--teal-dk); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+.chat-list-info { flex: 1; min-width: 0; }
+.chat-list-name { font-weight: 600; font-size: 0.88rem; color: var(--ink); }
+.chat-list-preview { font-size: 0.78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-list-time { font-size: 0.72rem; color: var(--slate); }
+.chat-view { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.chat-header-top { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--off-white); background: var(--card-bg); }
+.btn-back { background: var(--off-white); border: none; border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 0.82rem; color: var(--ink); font-weight: 600; }
+.messages-list { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: var(--bg); min-height: 0; }
+.msg-bubble { max-width: 72%; padding: 10px 14px; border-radius: 16px; font-size: 0.85rem; line-height: 1.45; word-break: break-word; }
+.msg-bubble.mine { align-self: flex-end; background: var(--teal-dk); color: #fff; border-bottom-right-radius: 4px; }
+.msg-bubble.theirs { align-self: flex-start; background: var(--card-bg); color: var(--ink); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+.msg-time { font-size: 0.65rem; opacity: 0.65; margin-top: 4px; display: block; text-align: right; }
+.chat-send-area { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--off-white); background: var(--card-bg); }
+.chat-send-area input { flex: 1; border: 1.5px solid var(--border); border-radius: 50px; padding: 9px 16px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; outline: none; background: var(--bg); }
+.chat-send-area input:focus { border-color: var(--teal-dk); }
+.btn-send { background: var(--teal-dk); color: #fff; border: none; border-radius: 50px; padding: 9px 20px; cursor: pointer; font-weight: 600; font-size: 0.85rem; transition: background 0.2s; }
+.btn-send:hover { background: var(--teal-md); }
+.msg-owner-btn { width: 100%; margin-top: 16px; padding: 13px; background: var(--teal-dk); color: #fff; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+.msg-owner-btn:hover { background: var(--teal-md); }
+.chat-unread { background: rgba(87,112,122,0.08) !important; border-left: 3px solid var(--teal-dk); }
+.chat-new-dot {
+  display: inline-block; width: 8px; height: 8px;
+  background: #e53935; border-radius: 50%;
+  margin-left: 6px; vertical-align: middle;
+  animation: pulse 1.5s infinite;
+}
+.chat-unread { background: rgba(87,112,122,0.08); border-left: 3px solid var(--teal-dk); }
+.chat-new-dot {
+  display: inline-block; width: 8px; height: 8px;
+  background: var(--teal-dk); border-radius: 50%;
+  margin-left: 6px; vertical-align: middle;
+  animation: pulse 2s infinite;
+}
+#msgBadge {
+  display: none; align-items: center; justify-content: center;
+  background: red; color: white; border-radius: 50%;
+  width: 18px; height: 18px; font-size: 0.7rem;
+  position: absolute; top: -6px; right: -6px;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <a href="#" class="logo">
+    <div class="logo-mark"><span>B2B</span></div>
+    <div class="logo-text">Back 2 Belong<small>Campus Lost &amp; Found</small></div>
+  </a>
+  <nav>
+    <button class="btn btn-ghost" onclick="toggleNotif()">
+      🔔 <span id="notifCount" style="display:none; background:var(--lost-clr); color:#fff; border-radius:50px; font-size:0.7rem; padding:1px 6px;">0</span>
+    </button>
+    <button id="msgBtn" class="btn btn-ghost" onclick="openChatsPanel()" style="display:none; position:relative; overflow:visible;">
+  💬 Messages
+  <span id="msgBadge" style="display:none; background:red; color:white; border-radius:50%; width:18px; height:18px; font-size:0.7rem; line-height:18px; text-align:center; position:absolute; top:-6px; right:-6px;">0</span>
+</button>
+    <div id="authArea">
+      <button class="btn btn-ghost" onclick="openModal('authModal')">Sign In</button>
+      <button class="btn btn-primary" onclick="openModal('authModal')">Join Free</button>
+    </div>
+    <div id="userInfo">
+      <div class="avatar" id="avatarEl">?</div>
+      <span id="userNameEl" style="font-size:0.85rem; color:var(--off-white);">User</span>
+      <button class="btn btn-ghost" onclick="signOut()" style="font-size:0.8rem;">Out</button>
+    </div>
+    <button onclick="toggleMobileMenu()" style="display:flex; background:rgba(151,157,171,0.15); border:none; border-radius:8px; width:36px; height:36px; color:var(--off-white); font-size:1.3rem; cursor:pointer; align-items:center; justify-content:center;" id="hamburgerBtn">☰</button>
+  </nav>
+</header>
+
+<!-- Mobile Drawer -->
+<div id="mobileDrawer" style="position:fixed; top:64px; right:0; width:260px; height:calc(100vh - 64px); background:var(--ink); z-index:199; transform:translateX(100%); transition:transform 0.3s ease; padding:20px; display:flex; flex-direction:column; gap:10px; border-left:1px solid rgba(151,157,171,0.2); overflow-y:auto;">
+  <div style="color:var(--off-white); font-family:'Syne',sans-serif; font-weight:700; font-size:1rem; margin-bottom:8px;">Menu</div>
+  <button onclick="setMode('all'); closeMobileMenu()" style="padding:12px; background:rgba(151,157,171,0.1); border:1px solid rgba(151,157,171,0.2); border-radius:10px; color:var(--off-white); cursor:pointer; text-align:left; font-size:0.9rem;">📋 All Items</button>
+  <button onclick="setMode('lost'); closeMobileMenu()" style="padding:12px; background:rgba(139,58,58,0.15); border:1px solid rgba(139,58,58,0.3); border-radius:10px; color:#e88; cursor:pointer; text-align:left; font-size:0.9rem;">🔍 Lost Items</button>
+  <button onclick="setMode('found'); closeMobileMenu()" style="padding:12px; background:rgba(46,107,79,0.15); border:1px solid rgba(46,107,79,0.3); border-radius:10px; color:#8e8; cursor:pointer; text-align:left; font-size:0.9rem;">✅ Found Items</button>
+  <button onclick="toggleBookmarkFilter(); closeMobileMenu()" style="padding:12px; background:rgba(151,157,171,0.1); border:1px solid rgba(151,157,171,0.2); border-radius:10px; color:var(--off-white); cursor:pointer; text-align:left; font-size:0.9rem;">🔖 Saved Items</button>
+  <button onclick="showMyLost(); closeMobileMenu()" style="padding:12px; background:rgba(139,58,58,0.15); border:1px solid rgba(139,58,58,0.3); border-radius:10px; color:#e88; cursor:pointer; text-align:left; font-size:0.9rem;">🔍 My Lost Posts</button>
+  <button onclick="showMyFound(); closeMobileMenu()" style="padding:12px; background:rgba(46,107,79,0.15); border:1px solid rgba(46,107,79,0.3); border-radius:10px; color:#8e8; cursor:pointer; text-align:left; font-size:0.9rem;">✅ My Found Posts</button>
+  <button onclick="toggleDarkMode(); closeMobileMenu()" style="padding:12px; background:rgba(151,157,171,0.1); border:1px solid rgba(151,157,171,0.2); border-radius:10px; color:var(--off-white); cursor:pointer; text-align:left; font-size:0.9rem;">🌙 Dark Mode</button>
+  <hr style="border-color:rgba(151,157,171,0.2);">
+  <div id="drawerAuth">
+    <button onclick="openModal('authModal'); closeMobileMenu()" style="width:100%; padding:12px; background:var(--teal-dk); border:none; border-radius:10px; color:#fff; cursor:pointer; font-size:0.9rem; font-weight:600;">Sign In / Join Free</button>
+  </div>
+  <div id="drawerUser" style="display:none; flex-direction:column; gap:8px;">
+    <div id="drawerUserName" style="color:var(--off-white); font-size:0.9rem; padding:8px 0;">👤 User</div>
+    <button onclick="signOut(); closeMobileMenu()" style="padding:12px; background:rgba(139,58,58,0.2); border:1px solid rgba(139,58,58,0.3); border-radius:10px; color:#e88; cursor:pointer; font-size:0.9rem;">Sign Out</button>
+  </div>
+</div>
+<div id="drawerOverlay" onclick="closeMobileMenu()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:198;"></div>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-tag"><span class="dot"></span> Campus Lost &amp; Found Platform</div>
+  <h1>Lost something?<br><span class="grad">We'll help you find it.</span></h1>
+  <p>A smarter, faster way to report and recover lost items across campus — with smart matching, image uploads, and secure claim codes.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num" id="statTotal">0</div><div class="stat-label">Total Posts</div></div>
+    <div class="stat"><div class="stat-num" id="statFound">0</div><div class="stat-label">Items Found</div></div>
+    <div class="stat"><div class="stat-num" id="statLost">0</div><div class="stat-label">Being Searched</div></div>
+  </div>
+  <div class="mode-toggle">
+    <div class="toggle-wrap">
+      <button class="mode-btn active-lost" id="modeAll" onclick="setMode('all')">📋 All Items</button>
+      <button class="mode-btn" id="modeLost" onclick="setMode('lost')">🔍 Lost</button>
+      <button class="mode-btn" id="modeFound" onclick="setMode('found')">✅ Found</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SEARCH ══ -->
+<div class="search-section">
+  <div class="search-bar">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search for wallet, phone, keys, ID card…" oninput="filterPosts()">
+    <button class="btn btn-teal" onclick="filterPosts()">Search</button>
+  </div>
+  <div class="filters">
+    <select class="filter-select" id="filterCategory" onchange="filterPosts()">
+      <option value="">All Categories</option>
+      <option>Electronics</option><option>ID Cards</option><option>Books</option>
+      <option>Accessories</option><option>Keys</option><option>cash/wallet</option>
+      <option>Documents</option><option>Others</option>
+    </select>
+    <select class="filter-select" id="filterLocation" onchange="filterPosts()">
+      <option value="">All Locations</option>
+      <option>Library</option><option>Canteen</option><option>IT Lab</option>
+      <option>Lab</option><option>Auditorium</option><option>Sports Ground</option>
+      <option>Parking Lot</option><option>Staff room</option><option>Washroom</option>
+      <option>Gym khana</option><option>1st Floor</option><option>2nd Floor</option>
+      <option>3rd Floor</option><option>4th Floor</option><option>5th Floor</option>
+      <option>6th Floor</option><option>7th Floor</option><option>8th Floor</option>
+    </select>
+    <select class="filter-select" id="filterDate" onchange="filterPosts()">
+      <option value="">Any Date</option>
+      <option value="1">Today</option><option value="3">Last 3 Days</option>
+      <option value="7">This Week</option><option value="14">Last 2 Weeks</option>
+    </select>
+    <button class="filter-tag" id="bookmarkFilter" onclick="toggleBookmarkFilter()">🔖 Saved</button>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<main class="main">
+  <div style="margin-bottom: 36px;">
+    <div class="section-header"><div class="section-title">🔥 Trending Searches</div></div>
+    <div class="trending-strip" id="trendingStrip"></div>
+  </div>
+  <div class="section-header">
+    <div class="section-title">Recent Posts <span class="pill" id="postCount">0</span></div>
+    <span class="see-all" onclick="resetFilters()">Clear Filters</span>
+  </div>
+  <div id="loadingSpinner"><div class="spinner"></div></div>
+  <div class="cards-grid" id="cardsGrid"></div>
+  <div id="emptyState" class="empty-state" style="display:none;">
+    <div class="empty-icon">🔍</div>
+    <h3>No items found</h3>
+    <p>Try a different search or clear your filters.</p>
+  </div>
+</main>
+
+<!-- ══ FAB ══ -->
+<div class="fab">
+  <button class="fab-btn fab-lost" onclick="openCreateModal('lost')">＋ Report Lost</button>
+  <button class="fab-btn fab-found" onclick="openCreateModal('found')">＋ Report Found</button>
+</div>
+
+<!-- ══ NOTIFICATIONS PANEL ══ -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header"><h3>Notifications <span class="notif-dot"></span></h3></div>
+  <div id="notifList">
+    <div class="notif-item unread"><div class="notif-title">🎉 Someone responded to your post!</div><div class="notif-time">2 minutes ago</div></div>
+    <div class="notif-item unread"><div class="notif-title">✨ Smart Match: A wallet was found near Library</div><div class="notif-time">1 hour ago</div></div>
+    <div class="notif-item"><div class="notif-title">📢 Your post expires in 3 days</div><div class="notif-time">Yesterday</div></div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ══ MODAL: CREATE POST ══ -->
+<div class="overlay" id="createModal" onclick="closeOnOverlay(event,'createModal')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="createModalTitle">Report Lost Item</div>
+      <button class="modal-close" onclick="closeModal('createModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="type-toggle-row">
+        <button class="type-btn active-lost" id="typeLostBtn" onclick="setCreateType('lost')">🔍 I Lost Something</button>
+        <button class="type-btn" id="typeFoundBtn" onclick="setCreateType('found')">✅ I Found Something</button>
+      </div>
+      <div class="form-group"><label class="form-label">Title <span>*</span></label><input class="form-input" id="postTitle" placeholder="e.g. Black Wallet Lost" maxlength="80"></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="postDesc" placeholder="Describe the item — color, brand, any identifying marks…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Category <span>*</span></label>
+          <select class="form-select" id="postCategory">
+            <option value="">Select…</option><option>Electronics</option><option>ID Cards</option>
+            <option>Books</option><option>Accessories</option><option>Keys</option>
+            <option>cash/wallet</option><option>Documents</option><option>Others</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Location <span>*</span></label>
+          <select class="form-select" id="postLocation">
+            <option value="">Select…</option><option>Library</option><option>Canteen</option>
+            <option>IT lab</option><option>lab</option><option>Auditorium</option>
+            <option>Sports Ground</option><option>Parking Lot</option><option>Staff room</option>
+            <option>washroom</option><option>Gym khana</option><option>1st Floor</option>
+            <option>2nd Floor</option><option>3rd Floor</option><option>4th Floor</option>
+            <option>5th Floor</option><option>6th Floor</option><option>7th Floor</option><option>8th Floor</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Date <span>*</span></label><input class="form-input" id="postDate" type="date"></div>
+        <div class="form-group"><label class="form-label">Your Email</label><input class="form-input" id="postEmail" type="email" placeholder="for contact"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Photo</label>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('imgInput').click()" ondragover="handleDrag(event)" ondrop="handleDrop(event)">
+          <div class="upload-icon">📷</div>
+          <p>Click to upload or drag &amp; drop<br><span style="font-size:0.75rem;color:var(--slate);">PNG, JPG up to 5MB</span></p>
+          <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="previewImage(event)">
+        </div>
+        <img id="imagePreview" src="" alt="Preview">
+      </div>
+      <button id="submitPostBtn" class="btn btn-teal" style="width:100%; padding:14px; border-radius:14px; font-size:0.95rem; font-family:'Syne',sans-serif; font-weight:700;" onclick="submitPost()">Submit Post →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: POST DETAIL ══ -->
+<div class="overlay" id="detailModal" onclick="closeOnOverlay(event,'detailModal')">
+  <div class="modal" id="detailModalContent">
+    <div class="modal-header">
+      <div class="modal-title">Item Details</div>
+      <button class="modal-close" onclick="closeModal('detailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<!-- ══ MODAL: AUTH ══ -->
+<div class="overlay" id="authModal" onclick="closeOnOverlay(event,'authModal')">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <div class="modal-title">Welcome to B2B</div>
+      <button class="modal-close" onclick="closeModal('authModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabSignIn" onclick="switchAuthTab('signin')">Sign In</button>
+        <button class="auth-tab" id="tabSignUp" onclick="switchAuthTab('signup')">Create Account</button>
+      </div>
+      <div id="signInForm">
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="signInEmail" type="email" placeholder="your@email.com" onkeydown="if(event.key==='Enter'){signIn()}"></div>
+        <div class="form-group">
+  <label class="form-label">Password</label>
+  <div style="position:relative;">
+    <input class="form-input" id="signInPassword" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter'){signIn()}" style="padding-right:44px;">
+    <button type="button" onclick="togglePass('signInPassword','signInEye')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--slate);" id="signInEye">👁️</button>
+  </div>
+</div>
+        <button class="btn btn-teal" style="width:100%; padding:13px; border-radius:12px; font-size:0.95rem; margin-top:4px;" onclick="signIn()">Sign In</button>
+        <button class="btn" style="width:100%; padding:13px; border-radius:12px; font-size:0.95rem; margin-top:10px; background:#4285F4; color:#fff; border:none;" onclick="signInWithGoogle()">Continue with Google</button>
+      </div>
+      <div id="signUpForm" style="display:none;">
+        <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" id="signUpName" placeholder="Your Name"></div>
+        <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="signUpEmail" type="email" placeholder="your@email.com"></div>
+        <div class="form-group">
+  <label class="form-label">Password</label>
+  <div style="position:relative;">
+    <input class="form-input" id="signUpPassword" type="password" placeholder="Min 6 characters" style="padding-right:44px;">
+    <button type="button" onclick="togglePass('signUpPassword','signUpEye')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--slate);" id="signUpEye">👁️</button>
+  </div>
+</div>
+        <button class="btn btn-teal" style="width:100%; padding:13px; border-radius:12px; font-size:0.95rem; margin-top:4px;" onclick="signUp()">Create Account</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: CHAT PANEL ══ -->
+<div class="overlay" id="chatPanel" onclick="closeOnOverlay(event,'chatPanel')">
+  <div class="modal chat-panel">
+    <div class="modal-header">
+      <div class="modal-title">💬 Messages</div>
+      <button class="modal-close" onclick="closeModal('chatPanel')">✕</button>
+    </div>
+    <div id="chatListSection" class="chat-list">
+      <div style="text-align:center; padding:30px; color:var(--muted);">Loading conversations...</div>
+    </div>
+    <div id="chatViewSection" style="display:none; flex:1; flex-direction:column; min-height:0;">
+      <div class="chat-header-top">
+        <button class="btn-back" onclick="backToChats()">← Back</button>
+        <h3 id="chatUserDisplay" style="font-size:0.95rem; font-family:'Syne',sans-serif;"></h3>
+      </div>
+      <div id="messagesBox" class="messages-list"></div>
+      <div class="chat-send-area">
+        <input id="msgText" type="text" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMsg();">
+        <button class="btn-send" onclick="sendMsg()">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+<script>
+/* ══ FIREBASE CONFIG ══ */
+const firebaseConfig = {
+  apiKey: "AIzaSyA1iUttsYkqY5l7B0-j171GPfoubZnRwM4",
+  authDomain: "back2belong.firebaseapp.com",
+  projectId: "back2belong",
+  storageBucket: "back2belong.firebasestorage.app",
+  messagingSenderId: "1074562132765",
+  appId: "1:1074562132765:web:e4f92fc0fc7faa81140ff4"
+};
+firebase.initializeApp(firebaseConfig);
+emailjs.init("gDwPixujXWywhVmku");
+const auth    = firebase.auth();
+const db      = firebase.firestore();
+const storage = firebase.storage();
+const CLOUDINARY_CLOUD = 'daqbaz2cg';
+const CLOUDINARY_UPLOAD_PRESET = 'b2b_unsigned';
+
+/* ══ STATE ══ */
+let allPosts        = [];
+let currentUser     = null;
+let bookmarks       = new Set();
+let showBookmarks   = false;
+let currentMode     = 'all';
+let uploadedImgB64  = null;
+let uploadedFile    = null;
+let editingPostId   = null;
+let editingImageUrl = '';
+let createType      = 'lost';
+let notifOpen       = false;
+let detailPostId    = null;
+let chatsList       = [];
+let currentOpenChat = null;
+let msgListener     = null;
+
+const CAT_ICONS = { Electronics:'📱', 'ID Cards':'🪪', Books:'📚', Accessories:'👜', Keys:'🔑', Others:'📦' };
+const TRENDING  = ['Wallet','Phone','Keys','Laptop','ID Card','AirPods','Bag','Watch','Charger','Glasses'];
+
+/* ══ AUTH ══ */
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+  const authArea = document.getElementById('authArea');
+  const userInfo = document.getElementById('userInfo');
+  if (user) {
+    authArea.style.display = 'none';
+    userInfo.style.display = 'flex';
+    document.getElementById('avatarEl').textContent = (user.displayName || user.email)[0].toUpperCase();
+    document.getElementById('userNameEl').textContent = user.displayName || user.email.split('@')[0];
+    loadBookmarks(user.uid);
+    onLoginChat();
+    const drawerAuth = document.getElementById('drawerAuth');
+    const drawerUser = document.getElementById('drawerUser');
+    const drawerName = document.getElementById('drawerUserName');
+    if (drawerAuth) drawerAuth.style.display = 'none';
+    if (drawerUser) drawerUser.style.display = 'flex';
+    if (drawerName) drawerName.textContent = '👤 ' + (user.displayName || user.email.split('@')[0]);
+  } else {
+    authArea.style.display = 'flex';
+    userInfo.style.display = 'none';
+    bookmarks.clear();
+    onLogoutChat();
+    const drawerAuth = document.getElementById('drawerAuth');
+    const drawerUser = document.getElementById('drawerUser');
+    if (drawerAuth) drawerAuth.style.display = 'block';
+    if (drawerUser) drawerUser.style.display = 'none';
+  }
+});
+function signIn() {
+  const email = document.getElementById('signInEmail').value.trim();
+  const pass  = document.getElementById('signInPassword').value;
+
+  if (!email) return showToast('Please enter your email', 'error');
+  if (!pass)  return showToast('Please enter your password', 'error');
+
+  const btn = document.querySelector('#signInForm .btn-teal');
+  if (btn) { btn.textContent = 'Signing in...'; btn.disabled = true; }
+
+  auth.signInWithEmailAndPassword(email, pass)
+    .then(() => {
+      if (btn) { btn.textContent = 'Sign In'; btn.disabled = false; }
+      closeModal('authModal');
+      showToast('Welcome back! 👋', 'success');
+    })
+    .catch(e => {
+      if (btn) { btn.textContent = 'Sign In'; btn.disabled = false; }
+
+      console.log('Sign in error code:', e.code); // helps debug
+
+      switch(e.code) {
+        case 'auth/invalid-credential':
+        case 'auth/invalid-login-credentials':
+        case 'auth/wrong-password':
+        case 'auth/user-not-found':
+          showToast('Incorrect email or password. Please try again.', 'error');
+          break;
+        case 'auth/invalid-email':
+          showToast('Please enter a valid email address.', 'error');
+          break;
+        case 'auth/user-disabled':
+          showToast('This account has been disabled.', 'error');
+          break;
+        case 'auth/too-many-requests':
+          showToast('Too many failed attempts. Please wait a few minutes and try again.', 'error');
+          break;
+        case 'auth/network-request-failed':
+          showToast('No internet connection. Please check your network.', 'error');
+          break;
+        case 'auth/operation-not-allowed':
+          showToast('Email sign in is not enabled. Please contact support.', 'error');
+          break;
+        default:
+          showToast('Sign in failed. Please check your email and password.', 'error');
+          break;
+      }
+    });
+}
+function signUp() {
+  const name  = document.getElementById('signUpName').value.trim();
+  const email = document.getElementById('signUpEmail').value.trim();
+  const pass  = document.getElementById('signUpPassword').value;
+  if (!name || !email || !pass) return showToast('Please fill all fields', 'error');
+  auth.createUserWithEmailAndPassword(email, pass)
+    .then(cred => cred.user.updateProfile({ displayName: name }))
+    .then(() => { closeModal('authModal'); showToast('Account created! 🎉', 'success'); })
+    .catch(e => showToast(e.message, 'error'));
+}
+function signInWithGoogle() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then(() => { closeModal('authModal'); showToast('Signed in with Google! 🎉', 'success'); })
+    .catch(e => showToast(e.message, 'error'));
+}
+function togglePass(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn   = document.getElementById(btnId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (btn) btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    if (btn) btn.textContent = '👁️';
+  }
+}
+function signOut() { auth.signOut().then(() => showToast('Signed out. See you soon!', 'info')); }
+function switchAuthTab(tab) {
+  document.getElementById('signInForm').style.display  = tab === 'signin' ? 'block' : 'none';
+  document.getElementById('signUpForm').style.display  = tab === 'signup' ? 'block' : 'none';
+  document.getElementById('tabSignIn').classList.toggle('active', tab === 'signin');
+  document.getElementById('tabSignUp').classList.toggle('active', tab === 'signup');
+}
+
+/* ══ BOOKMARKS ══ */
+function loadBookmarks(uid) {
+  db.collection('bookmarks').doc(uid).collection('items').get().then(snap => {
+    bookmarks.clear();
+    snap.forEach(d => bookmarks.add(d.id));
+    renderCards();
+  });
+}
+function toggleBookmark(e, postId) {
+  e.stopPropagation();
+  if (!currentUser) { openModal('authModal'); showToast('Sign in to bookmark posts', 'info'); return; }
+  const ref = db.collection('bookmarks').doc(currentUser.uid).collection('items').doc(postId);
+  if (bookmarks.has(postId)) {
+    bookmarks.delete(postId); ref.delete(); showToast('Bookmark removed', 'info');
+  } else {
+    bookmarks.add(postId); ref.set({ ts: firebase.firestore.FieldValue.serverTimestamp() }); showToast('Saved to bookmarks 🔖', 'success');
+  }
+  renderCards();
+}
+function toggleBookmarkFilter() {
+  showBookmarks = !showBookmarks;
+  document.getElementById('bookmarkFilter').classList.toggle('active', showBookmarks);
+  filterPosts();
+}
+
+/* ══ LOAD POSTS ══ */
+function loadPosts() {
+  document.getElementById('loadingSpinner').style.display = 'block';
+  db.collection('posts').orderBy('createdAt', 'desc').limit(60)
+    .onSnapshot(snap => {
+      allPosts = [];
+      snap.forEach(doc => { allPosts.push({ id: doc.id, ...doc.data() }); });
+      updateStats(); filterPosts(); renderTrending();
+      document.getElementById('loadingSpinner').style.display = 'none';
+    }, err => {
+      console.error('Firestore error:', err);
+      document.getElementById('loadingSpinner').style.display = 'none';
+    });
+}
+
+/* ══ STATS ══ */
+function updateStats() {
+  animateNum('statTotal', allPosts.length);
+  animateNum('statFound', allPosts.filter(p => p.type === 'found').length);
+  animateNum('statLost',  allPosts.filter(p => p.type === 'lost').length);
+}
+function animateNum(id, target) {
+  const el = document.getElementById(id);
+  let cur = 0; const step = Math.ceil(target / 30);
+  const iv = setInterval(() => { cur = Math.min(cur + step, target); el.textContent = cur; if (cur >= target) clearInterval(iv); }, 40);
+}
+
+/* ══ FILTER & MODE ══ */
+function setMode(mode) {
+  currentMode = mode;
+  ['modeAll','modeLost','modeFound'].forEach(id => { const b = document.getElementById(id); if(b) b.classList.remove('active-lost','active-found'); });
+  const map = { all:'modeAll', lost:'modeLost', found:'modeFound' };
+  const cls = mode === 'found' ? 'active-found' : 'active-lost';
+  const btn = document.getElementById(map[mode]);
+  if (btn) btn.classList.add(cls);
+  filterPosts();
+  document.getElementById('cardsGrid').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function filterPosts() {
+  const query    = document.getElementById('searchInput').value.trim().toLowerCase();
+  const category = document.getElementById('filterCategory').value;
+  const location = document.getElementById('filterLocation').value;
+  const days     = parseInt(document.getElementById('filterDate').value) || 0;
+  const now      = new Date();
+  let filtered = allPosts.filter(p => {
+    if (currentMode !== 'all' && p.type !== currentMode) return false;
+    if (showBookmarks && !bookmarks.has(p.id)) return false;
+    if (category && p.category !== category) return false;
+    if (location && p.location !== location) return false;
+    if (days) { const postDate = p.date ? new Date(p.date) : (p.createdAt?.toDate?.() || now); if ((now - postDate) / 86400000 > days) return false; }
+    if (query) { const hay = `${p.title} ${p.description} ${p.category} ${p.location}`.toLowerCase(); if (!hay.includes(query)) return false; }
+    return true;
+  });
+  document.getElementById('postCount').textContent = filtered.length;
+  renderCards(filtered, query);
+}
+function resetFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('filterCategory').value = '';
+  document.getElementById('filterLocation').value = '';
+  document.getElementById('filterDate').value = '';
+  showBookmarks = false;
+  document.getElementById('bookmarkFilter').classList.remove('active');
+  filterPosts();
+}
+
+/* ══ RENDER CARDS ══ */
+function renderCards(posts, query) {
+  const data  = posts !== undefined ? posts : allPosts;
+  const grid  = document.getElementById('cardsGrid');
+  const empty = document.getElementById('emptyState');
+  if (data.length === 0) { grid.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  grid.innerHTML = data.map((p, i) => {
+    const daysLeft = getDaysLeft(p);
+    const isBook   = bookmarks.has(p.id);
+    const hasMatch = query ? findMatches(p, allPosts).length > 0 : false;
+    const imgHtml  = p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.title}" loading="lazy">` : `<div class="placeholder-icon">${CAT_ICONS[p.category] || '📦'}</div>`;
+    return `
+    <div class="card" style="animation-delay:${i*0.06}s" onclick="openDetail('${p.id}')">
+      <div class="card-img">
+        ${imgHtml}
+        <div class="card-status status-${p.type}">${p.type==='lost'?'🔍 Lost':'✅ Found'}</div>
+        <div class="card-actions-top">
+          <button class="card-icon-btn ${isBook?'bookmarked':''}" title="Bookmark" onclick="toggleBookmark(event,'${p.id}')">🔖</button>
+          <button class="card-icon-btn" title="Report" onclick="reportPost(event,'${p.id}')">🚩</button>
+          ${currentUser && currentUser.uid === p.userId ? `
+            <button class="card-icon-btn" title="Edit" onclick="event.stopPropagation(); openEditPost('${p.id}')">✏️</button>
+            <button class="card-icon-btn" title="Delete" onclick="event.stopPropagation(); deletePost('${p.id}')">🗑️</button>
+          ` : ''}
+        </div>
+        ${daysLeft <= 3 ? `<div class="card-expiry">⏳ ${daysLeft}d left</div>` : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-cat">${CAT_ICONS[p.category]||''} ${p.category}</div>
+        <div class="card-title">${highlight(p.title, query)}</div>
+        <div class="card-desc">${p.description || 'No description provided.'}</div>
+        ${hasMatch ? `<div class="match-badge">✨ Smart Match Found</div>` : ''}
+        <div class="card-meta">
+          <span class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>${p.location}</span>
+          <span class="meta-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${formatDate(p.date)}</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button class="card-contact-btn" onclick="event.stopPropagation(); openDetail('${p.id}')">Contact →</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function highlight(text, query) {
+  if (!query) return text;
+  return text.replace(new RegExp(`(${query})`, 'gi'), '<mark style="background:rgba(87,112,122,0.25);border-radius:3px;padding:0 2px;">$1</mark>');
+}
+
+/* ══ POST DETAIL ══ */
+function openDetail(id) {
+  const p = allPosts.find(x => x.id === id);
+  if (!p) return;
+  detailPostId = id;
+  const matches = findMatches(p, allPosts).slice(0, 3);
+  const ownerName = p.ownerName || 'Owner';
+  document.getElementById('detailBody').innerHTML = `
+    ${p.imageUrl ? `<img src="${p.imageUrl}" class="detail-img" alt="${p.title}">` : ''}
+    <div class="detail-badges">
+      <span class="detail-badge status-${p.type}" style="padding:6px 16px; border-radius:50px;">${p.type==='lost'?'🔍 Lost':'✅ Found'}</span>
+      <span class="detail-badge" style="background:var(--off-white); color:var(--teal-dk);">${CAT_ICONS[p.category]||''} ${p.category}</span>
+    </div>
+    ${currentUser && currentUser.uid === p.userId ? `
+      <div class="detail-owner-actions">
+        <button class="btn btn-ghost" style="margin-right:10px;" onclick="openEditPost('${p.id}')">Edit Post</button>
+       <button class="btn btn-ghost" style="background:rgba(255,70,70,0.12); color:#B83232;" onclick="deletePost('${p.id}')">Delete Post</button>
+        ${p.type === 'lost' ? `
+        <button class="btn" style="width:100%;margin-top:10px;padding:12px;border-radius:12px;background:#2E6B4F;color:#fff;font-size:0.9rem;font-weight:600;border:none;cursor:pointer;" onclick="markAsResolved('${p.id}','lost')">
+          ✅ I Found My Item — Remove Post
+        </button>` : `
+        <button class="btn" style="width:100%;margin-top:10px;padding:12px;border-radius:12px;background:#2E6B4F;color:#fff;font-size:0.9rem;font-weight:600;border:none;cursor:pointer;" onclick="markAsResolved('${p.id}','found')">
+          ✅ Item Returned to Owner — Remove Post
+        </button>`}
+      </div>` : ''}
+    <div class="detail-title">${p.title}</div>
+    <div class="detail-desc">${p.description || 'No description provided.'}</div>
+    <div class="detail-grid">
+      <div class="detail-item"><div class="detail-item-label">Location</div><div class="detail-item-val">📍 ${p.location}</div></div>
+      <div class="detail-item"><div class="detail-item-label">Date</div><div class="detail-item-val">📅 ${formatDate(p.date)}</div></div>
+      <div class="detail-item"><div class="detail-item-label">Status</div><div class="detail-item-val">${p.type==='lost'?'🔴 Being Searched':'🟢 Available'}</div></div>
+    </div>
+    ${p.email ? `
+    <div class="contact-form">
+      <h4>📬 Contact Finder / Owner via Email</h4>
+      <div class="form-group"><label class="form-label">Your Message</label><textarea class="form-textarea" id="contactMsg" placeholder="Hi! I think I found/lost this item…" rows="3"></textarea></div>
+      <div class="form-group"><label class="form-label">Your Email</label><input class="form-input" id="contactEmail" type="email" placeholder="your@email.com"></div>
+      <button class="btn btn-teal" style="width:100%; padding:12px; border-radius:12px;" onclick="sendContact('${p.email}')">Send Email ✉️</button>
+    </div>` : ''}
+    ${p.userId && p.userId !== currentUser?.uid ? `
+    <button class="msg-owner-btn" onclick="startChatWithOwner('${p.userId}','${ownerName.replace(/'/g,"\\'")}','${p.title.replace(/'/g,"\\'")}')">
+      💬 Message Owner — Chat Privately
+    </button>` : ''}
+    ${matches.length > 0 ? `
+    <div class="similar-section">
+      <h4>✨ Smart Matches — ${p.type==='lost'?'Found Items':'Lost Items'} Nearby</h4>
+      <div class="similar-list">
+        ${matches.map(m => `
+          <div class="similar-item" onclick="closeModal('detailModal'); setTimeout(()=>openDetail('${m.id}'),200)">
+            <div class="similar-thumb">${CAT_ICONS[m.category]||'📦'}</div>
+            <div class="similar-info"><div class="similar-title">${m.title}</div><div class="similar-loc">📍 ${m.location} · ${formatDate(m.date)}</div></div>
+            <span class="card-status status-${m.type}" style="position:static; font-size:0.65rem;">${m.type}</span>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+  `;
+  openModal('detailModal');
+}
+function openEditPost(id) {
+  const post = allPosts.find(x => x.id === id);
+  if (!post) return showToast('Post not found', 'error');
+  if (!currentUser || currentUser.uid !== post.userId) return showToast('You can only edit your own posts', 'error');
+  openCreateModal(post.type, id);
+}
+async function markAsResolved(id, type) {
+  const post = allPosts.find(x => x.id === id);
+  if (!post) return showToast('Post not found', 'error');
+  if (!currentUser || currentUser.uid !== post.userId) {
+    return showToast('Only the post owner can do this', 'error');
+  }
+
+  const msg = type === 'lost'
+    ? '🎉 Found your item? This will delete the post permanently.'
+    : '🎉 Item returned? This will delete the post permanently.';
+
+  if (!confirm(msg)) return;
+
+  try {
+    await db.collection('resolved').add({
+      postId:       id,
+      postTitle:    post.title || '',
+      postType:     type,
+      category:     post.category || '',
+      location:     post.location || '',
+      resolvedBy:   currentUser.uid,
+      resolverName: currentUser.displayName || currentUser.email.split('@')[0],
+      resolvedAt:   firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    await db.collection('posts').doc(id).delete();
+
+    closeModal('detailModal');
+    showToast(
+      type === 'lost'
+        ? '🎉 So glad you found it! Post removed.'
+        : '🎉 Great! Post removed successfully.',
+      'success'
+    );
+
+  } catch(e) {
+    console.error('Resolve error:', e);
+    showToast('Could not remove post. Please try again.', 'error');
+  }
+}
+async function deletePost(id) {
+  const post = allPosts.find(x => x.id === id);
+  if (!post) return showToast('Post not found', 'error');
+  if (!currentUser || currentUser.uid !== post.userId) return showToast('You can only delete your own posts', 'error');
+  if (!confirm('Delete this post permanently?')) return;
+  try {
+    await db.collection('posts').doc(id).delete();
+    showToast('Post deleted.', 'success');
+    closeModal('detailModal');
+  } catch(e) { showToast('Unable to delete post.', 'error'); }
+}
+
+/* ══ EMAIL CONTACT ══ */
+function sendContact(ownerEmail) {
+  const msg   = document.getElementById('contactMsg').value.trim();
+  const email = document.getElementById('contactEmail').value.trim();
+  const post  = allPosts.find(x => x.id === detailPostId);
+  if (!msg)   return showToast('Please write a message', 'error');
+  if (!email) return showToast('Please enter your email', 'error');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showToast('Please enter a valid email', 'error');
+  showToast('Sending message... ⏳', 'info');
+  emailjs.send('service_t7rqqxk','template_cojhha6',{
+    to_email: ownerEmail, from_name: email.split('@')[0],
+    from_email: email, post_title: post ? post.title : 'Lost & Found Item',
+    message: msg, reply_to: email
+  }).then(() => {
+    showToast('✅ Message sent successfully!', 'success');
+    if (post?.userId) sendNotification(post.userId, `📬 Someone emailed you about "${post.title}"`, detailPostId);
+    document.getElementById('contactMsg').value = '';
+    document.getElementById('contactEmail').value = '';
+    if (currentUser) {
+      db.collection('messages').add({ from: email, to: ownerEmail, message: msg, postId: detailPostId, postTitle: post?post.title:'', read: false, ts: firebase.firestore.FieldValue.serverTimestamp() });
+    }
+  }).catch(() => showToast('❌ Failed to send. Please try again.', 'error'));
+}
+
+/* ══ SMART MATCHING ══ */
+function findMatches(post, pool) {
+  const words = `${post.title} ${post.category} ${post.description}`.toLowerCase().split(/\W+/).filter(w => w.length > 3);
+  return pool.filter(p => {
+    if (p.id === post.id || p.type === post.type) return false;
+    const target = `${p.title} ${p.category} ${p.description} ${p.location}`.toLowerCase();
+    return words.some(w => target.includes(w));
+  });
+}
+
+/* ══ CREATE POST ══ */
+function openCreateModal(type, postId = null) {
+  if (!currentUser) { openModal('authModal'); showToast('Please sign in to post', 'info'); return; }
+  const isEditing = !!postId;
+  setCreateType(type || 'lost');
+  const titleEl = document.getElementById('postTitle'), descEl = document.getElementById('postDesc'),
+        catEl = document.getElementById('postCategory'), locEl = document.getElementById('postLocation'),
+        dateEl = document.getElementById('postDate'), emailEl = document.getElementById('postEmail'),
+        imgPrev = document.getElementById('imagePreview');
+  if (isEditing) {
+    const post = allPosts.find(x => x.id === postId);
+    if (!post || post.userId !== currentUser.uid) { showToast('Unable to edit this post', 'error'); return; }
+    editingPostId = postId; editingImageUrl = post.imageUrl || '';
+    titleEl.value = post.title||''; descEl.value = post.description||''; catEl.value = post.category||'';
+    locEl.value = post.location||''; dateEl.value = post.date||new Date().toISOString().split('T')[0];
+    emailEl.value = post.email||currentUser.email||'';
+    if (editingImageUrl) { imgPrev.src = editingImageUrl; imgPrev.style.display = 'block'; } else { imgPrev.style.display = 'none'; }
+    document.getElementById('createModalTitle').textContent = 'Edit Post';
+    document.getElementById('submitPostBtn').textContent = 'Save Changes';
+  } else {
+    editingPostId = null; editingImageUrl = '';
+    titleEl.value=''; descEl.value=''; catEl.value=''; locEl.value='';
+    dateEl.value = new Date().toISOString().split('T')[0]; emailEl.value = currentUser.email||'';
+    imgPrev.style.display = 'none'; uploadedFile = null; uploadedImgB64 = null;
+    document.getElementById('createModalTitle').textContent = type==='lost' ? 'Report Lost Item' : 'Report Found Item';
+    document.getElementById('submitPostBtn').textContent = 'Submit Post →';
+  }
+  openModal('createModal');
+}
+function setCreateType(type) {
+  createType = type;
+  document.getElementById('typeLostBtn').className  = `type-btn ${type==='lost'?'active-lost':''}`;
+  document.getElementById('typeFoundBtn').className = `type-btn ${type==='found'?'active-found':''}`;
+  if (!editingPostId) document.getElementById('createModalTitle').textContent = type==='lost'?'Report Lost Item':'Report Found Item';
+}
+async function submitPost() {
+  const title    = document.getElementById('postTitle').value.trim();
+  const desc     = document.getElementById('postDesc').value.trim();
+  const category = document.getElementById('postCategory').value;
+  const location = document.getElementById('postLocation').value;
+  const date     = document.getElementById('postDate').value;
+  const email    = document.getElementById('postEmail').value.trim();
+  if (!title || !category || !location || !date) return showToast('Please fill Title, Category, Location and Date', 'error');
+  const originalPost = editingPostId ? allPosts.find(x => x.id === editingPostId) : null;
+  let imageUrl = originalPost ? (originalPost.imageUrl || '') : '';
+  showToast('Uploading post… ⏳', 'info');
+  if (uploadedFile) {
+    const url = await uploadImageToCloudinary(uploadedFile);
+    if (url) imageUrl = url;
+  }
+  const postData = {
+    type: createType, title, description: desc, category, location, date, email, imageUrl,
+    userId:    currentUser.uid,
+    ownerName: currentUser.displayName || currentUser.email.split('@')[0],
+    expired: false, claimed: false, reported: 0,
+    expiresAt: originalPost ? (originalPost.expiresAt || new Date(Date.now()+14*86400000)) : new Date(Date.now()+14*86400000),
+    createdAt: originalPost ? originalPost.createdAt : firebase.firestore.FieldValue.serverTimestamp()
+  };
+  try {
+    if (editingPostId) {
+      await db.collection('posts').doc(editingPostId).update(postData);
+      showToast('Post updated! 🎉', 'success');
+    } else {
+      await db.collection('posts').add(postData);
+      showToast('Post created! 🎉', 'success');
+      sendNotification(currentUser.uid, `✅ Your ${createType} post "${title}" is live!`, '');
+    }
+    if (email) {
+      emailjs.send('service_t7rqqxk','template_cojhha6',{
+        to_email: email, from_name: 'Back 2 Belong', from_email: 'noreply@back2belong.web.app',
+        post_title: title, message: `Your ${createType} post "${title}" has been published!`, reply_to: 'noreply@back2belong.web.app'
+      });
+    }
+    closeModal('createModal');
+    editingPostId = null; editingImageUrl = ''; uploadedFile = null;
+    document.getElementById('submitPostBtn').textContent = 'Submit Post →';
+  } catch(e) {
+    console.error(e);
+    showToast('Error saving post. Please try again.', 'error');
+  }
+}
+
+/* ══ IMAGE UPLOAD ══ */
+async function uploadImageToCloudinary(file) {
+  if (CLOUDINARY_UPLOAD_PRESET === 'YOUR_UNSIGNED_UPLOAD_PRESET') return await uploadImageToFirebaseStorage(file);
+  try {
+    const form = new FormData(); form.append('file', file); form.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    const res  = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/image/upload`, { method:'POST', body:form });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error?.message || 'Upload failed');
+    return data.secure_url || data.url || '';
+  } catch(err) { return await uploadImageToFirebaseStorage(file); }
+}
+async function uploadImageToFirebaseStorage(file) {
+  try {
+    const ref = storage.ref().child(`posts/${Date.now()}_${file.name}`);
+    await ref.put(file);
+    return await ref.getDownloadURL();
+  } catch(err) { return ''; }
+}
+function previewImage(e) {
+  const file = e.target.files[0]; if (!file) return;
+  uploadedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => { const img = document.getElementById('imagePreview'); img.src = ev.target.result; img.style.display = 'block'; uploadedImgB64 = ev.target.result; };
+  reader.readAsDataURL(file);
+}
+function handleDrag(e) { e.preventDefault(); document.getElementById('uploadZone').classList.add('drag-over'); }
+function handleDrop(e) {
+  e.preventDefault(); document.getElementById('uploadZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    uploadedFile = file;
+    const reader = new FileReader();
+    reader.onload = ev => { const img = document.getElementById('imagePreview'); img.src = ev.target.result; img.style.display = 'block'; uploadedImgB64 = ev.target.result; };
+    reader.readAsDataURL(file);
+  }
+}
+
+/* ══ REPORT ══ */
+function reportPost(e, id) {
+  e.stopPropagation();
+
+  if (!currentUser) {
+    showToast('Sign in to report posts', 'info');
+    return;
+  }
+
+  const post = allPosts.find(p => p.id === id);
+  if (!post) return;
+
+  if (post.userId === currentUser.uid) {
+    showToast('You cannot report your own post', 'info');
+    return;
+  }
+
+  // Ask for reason
+  const reason = prompt('Why are you reporting this post?\n\n1. Fake/Spam\n2. Wrong information\n3. Inappropriate content\n4. Other\n\nType your reason:');
+  if (!reason) return; // user cancelled
+
+  db.collection('reports').add({
+    postId:        id,
+    postTitle:     post.title || '',
+    postType:      post.type || '',
+    reportedBy:    currentUser.uid,
+    reporterEmail: currentUser.email || '',
+    reason:        reason,
+    ts:            firebase.firestore.FieldValue.serverTimestamp(),
+    status:        'pending'
+  })
+  .then(() => {
+    showToast('✅ Report submitted. Our team will review it.', 'success');
+  })
+  .catch(err => {
+    console.error('Report error:', err);
+    showToast('❌ Could not submit report.', 'error');
+  });
+}
+/* ══ TRENDING ══ */
+function renderTrending() {
+  document.getElementById('trendingStrip').innerHTML = TRENDING.map((t,i) => `
+    <div class="trending-chip" onclick="searchTrending('${t}')"><span class="rank">#${i+1}</span> ${t}</div>`).join('');
+}
+function searchTrending(term) { document.getElementById('searchInput').value = term; filterPosts(); }
+
+/* ══ NOTIFICATIONS ══ */
+function toggleNotif() {
+  notifOpen = !notifOpen;
+  document.getElementById('notifPanel').classList.toggle('open', notifOpen);
+  if (notifOpen) { document.getElementById('notifCount').style.display = 'none'; loadNotifications(); }
+}
+function loadNotifications() {
+  if (!currentUser) return;
+  const list = document.getElementById('notifList');
+  list.innerHTML = '<div class="spinner"></div>';
+  db.collection('notifications').where('userId','==',currentUser.uid).orderBy('ts','desc').limit(20).get()
+    .then(snap => {
+      if (snap.empty) { list.innerHTML = '<div style="padding:20px; text-align:center; color:var(--muted); font-size:0.85rem;">No notifications yet 🔔</div>'; return; }
+      list.innerHTML = '';
+      snap.forEach(doc => {
+        const d = doc.data();
+        const item = document.createElement('div');
+        item.className = `notif-item ${d.read?'':'unread'}`;
+        item.innerHTML = `<div class="notif-title">${d.message}</div><div class="notif-time">${formatTimeAgo(d.ts?.toDate?.())}</div>`;
+        item.onclick = () => { doc.ref.update({read:true}); item.classList.remove('unread'); if(d.postId) openDetail(d.postId); };
+        list.appendChild(item);
+      });
+    }).catch(() => {
+      list.innerHTML = '<div class="notif-item unread"><div class="notif-title">🎉 Welcome to Back 2 Belong!</div><div class="notif-time">Just now</div></div>';
+    });
+}
+function addNotif(msg) {
+  const cnt = document.getElementById('notifCount');
+  if (cnt) { cnt.style.display='flex'; cnt.textContent = parseInt(cnt.textContent||0)+1; }
+}
+
+/* ══ CHAT SYSTEM ══ */
+let globalChatWatcher = null;
+
+function startGlobalUnreadWatcher() {
+  if (globalChatWatcher) {
+    globalChatWatcher();
+    globalChatWatcher = null;
+  }
+  if (!currentUser) return;
+
+  // This ONLY watches unread count — does NOT touch the chat list UI
+  globalChatWatcher = db.collection('chats')
+    .where('participants', 'array-contains', currentUser.uid)
+    .onSnapshot(snap => {
+      let unreadCount = 0;
+      snap.forEach(doc => {
+        const d = doc.data();
+        if (Array.isArray(d.unreadBy) && d.unreadBy.includes(currentUser.uid)) {
+          unreadCount++;
+        }
+      });
+      updateMsgBadge(unreadCount);
+    }, err => {
+      console.error('Watcher error:', err);
+    });
+}
+function updateMsgBadge(count) {
+  const badge = document.getElementById('msgBadge');
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 9 ? '9+' : count;
+    badge.style.cssText =
+      'display:flex; align-items:center; justify-content:center;' +
+      'background:red; color:white; border-radius:50%;' +
+      'width:18px; height:18px; font-size:0.65rem; font-weight:700;' +
+      'position:absolute; top:-6px; right:-6px; pointer-events:none;';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+function onLoginChat() {
+  const btn = document.getElementById('msgBtn');
+  if (btn) btn.style.display = 'inline-flex';
+
+  // Start watching for unread messages IMMEDIATELY on login
+  // This runs in background — user does not need to open chat panel
+  startGlobalUnreadWatcher();
+  loadChatsList();
+}
+function onLogoutChat() {
+  const btn = document.getElementById('msgBtn');
+  if (btn) btn.style.display = 'none';
+
+  // Stop background watcher
+  if (globalChatWatcher) {
+    globalChatWatcher();
+    globalChatWatcher = null;
+  }
+  if (msgListener) {
+    msgListener();
+    msgListener = null;
+  }
+
+  chatsList = [];
+  currentOpenChat = null;
+  updateMsgBadge(0);
+}
+function openChatsPanel() {
+  if (!currentUser) {
+    openModal('authModal');
+    showToast('Sign in to view messages', 'info');
+    return;
+  }
+  openModal('chatPanel');
+  document.getElementById('chatListSection').style.display = 'block';
+  document.getElementById('chatViewSection').style.display = 'none';
+
+  // Only call loadChatsList once — it manages its own watcher internally
+  loadChatsList();
+}
+let chatListWatcher = null;
+
+function loadChatsList() {
+  if (!currentUser) return;
+  const section = document.getElementById('chatListSection');
+  if (!section) return;
+
+  // Stop previous watcher to avoid duplicates
+  if (chatListWatcher) {
+    chatListWatcher();
+    chatListWatcher = null;
+  }
+
+  section.innerHTML =
+    '<div style="text-align:center;padding:30px;color:var(--muted);">Loading...</div>';
+
+  chatListWatcher = db.collection('chats')
+    .where('participants', 'array-contains', currentUser.uid)
+    .orderBy('lastTs', 'desc')
+    .onSnapshot(snap => {
+      if (snap.empty) {
+        section.innerHTML =
+          '<div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem;">' +
+          '💬 No conversations yet.<br>Open a post and tap Message Owner!</div>';
+        updateMsgBadge(0);
+        return;
+      }
+
+      let unreadCount = 0;
+      section.innerHTML = '';
+
+      snap.forEach(doc => {
+        const d       = doc.data();
+        const oid     = d.participants.find(p => p !== currentUser.uid);
+        const oname   = (d.participantNames && d.participantNames[oid]) ? d.participantNames[oid] : 'User';
+        const lastMsg  = d.lastMsg || 'No messages yet';
+        const postTitle = d.postTitle ? '📌 ' + d.postTitle : '';
+        const isUnread = Array.isArray(d.unreadBy) && d.unreadBy.includes(currentUser.uid);
+        if (isUnread) unreadCount++;
+
+        const item = document.createElement('div');
+        item.className = 'chat-list-item' + (isUnread ? ' chat-unread' : '');
+        item.innerHTML =
+          '<div class="chat-avatar">' + oname[0].toUpperCase() + '</div>' +
+          '<div class="chat-list-info">' +
+            '<div class="chat-list-name">' + oname +
+              (isUnread ? '<span class="chat-new-dot"></span>' : '') +
+            '</div>' +
+            (postTitle ? '<div style="font-size:0.72rem;color:var(--teal-dk);">' + postTitle + '</div>' : '') +
+            '<div class="chat-list-preview">' + lastMsg + '</div>' +
+          '</div>' +
+          '<div class="chat-list-time">' + formatTimeAgo(d.lastTs?.toDate?.()) + '</div>';
+
+        item.onclick = () => {
+          if (isUnread) {
+            doc.ref.update({
+              unreadBy: firebase.firestore.FieldValue.arrayRemove(currentUser.uid)
+            }).catch(() => {});
+          }
+          openChat(doc.id, oid, oname);
+        };
+        section.appendChild(item);
+      });
+
+      updateMsgBadge(unreadCount);
+
+    }, err => {
+      console.error('Chat list error:', err);
+      // Only show error if section is still visible
+      if (section) {
+        section.innerHTML =
+          '<div style="text-align:center;padding:30px;color:var(--muted);">Could not load chats.<br><small>Check Firestore index below.</small></div>';
+      }
+    });
+}
+function openChat(chatId, otherUid, otherName) {
+  currentOpenChat = chatId;
+  document.getElementById('chatListSection').style.display = 'none';
+  const view = document.getElementById('chatViewSection');
+  view.style.display = 'flex';
+  document.getElementById('chatUserDisplay').textContent = otherName;
+  document.getElementById('messagesBox').innerHTML =
+    '<div style="text-align:center;padding:20px;color:var(--muted);">Loading...</div>';
+
+  // Clear unread for this user when they open the chat
+  db.collection('chats').doc(chatId).update({
+    unreadBy: firebase.firestore.FieldValue.arrayRemove(currentUser.uid)
+  }).catch(() => {});
+
+  // Stop old message listener
+  if (msgListener) { msgListener(); msgListener = null; }
+
+  // Real-time messages listener
+  msgListener = db.collection('chats').doc(chatId)
+    .collection('messages')
+    .orderBy('ts', 'asc')
+    .onSnapshot(snap => {
+      const box = document.getElementById('messagesBox');
+      if (!box) return;
+      box.innerHTML = '';
+      if (snap.empty) {
+        box.innerHTML =
+          '<div style="text-align:center;padding:20px;color:var(--muted);">No messages yet. Say hello! 👋</div>';
+        return;
+      }
+      snap.forEach(doc => {
+        const m    = doc.data();
+        const mine = m.senderId === currentUser.uid;
+        const div  = document.createElement('div');
+        div.className = 'msg-bubble ' + (mine ? 'mine' : 'theirs');
+        div.innerHTML =
+          '<div>' + (m.text || '') + '</div>' +
+          '<span class="msg-time">' + formatTimeAgo(m.ts?.toDate?.()) + '</span>';
+        box.appendChild(div);
+      });
+      box.scrollTop = box.scrollHeight;
+    }, err => {
+      console.error('Message error:', err);
+    });
+}
+function backToChats() {
+  if (msgListener) { msgListener(); msgListener = null; }
+  currentOpenChat = null;
+  document.getElementById('chatViewSection').style.display = 'none';
+  document.getElementById('chatListSection').style.display = 'block';
+  loadChatsList();
+}
+async function sendMsg() {
+  const input = document.getElementById('msgText');
+  const text  = input?.value?.trim();
+  if (!text || !currentOpenChat || !currentUser) return;
+  input.value = '';
+
+  try {
+    const chatRef  = db.collection('chats').doc(currentOpenChat);
+    const chatSnap = await chatRef.get();
+    if (!chatSnap.exists) return;
+    const chatData = chatSnap.data();
+
+    // Find the other person in this chat
+    const otherId = chatData.participants.find(p => p !== currentUser.uid);
+    const myName  = currentUser.displayName || currentUser.email.split('@')[0] || 'Someone';
+
+    // Save message to subcollection
+    await chatRef.collection('messages').add({
+      text:       text,
+      senderId:   currentUser.uid,
+      senderName: myName,
+      ts:         firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Update chat document:
+    // - lastMsg so preview shows in chat list
+    // - unreadBy marks the OTHER person as having unread
+    await chatRef.update({
+      lastMsg:  text,
+      lastTs:   firebase.firestore.FieldValue.serverTimestamp(),
+      unreadBy: firebase.firestore.FieldValue.arrayUnion(otherId)
+    });
+
+    // This triggers the other person's globalChatWatcher
+    // Their red badge will update automatically without them doing anything
+
+  } catch(e) {
+    console.error('Send error:', e);
+    showToast('Could not send message', 'error');
+  }
+}
+async function startChatWithOwner(ownerId, ownerName, postTitle) {
+  if (!currentUser) { openModal('authModal'); showToast('Sign in to message the owner','info'); return; }
+  if (ownerId === currentUser.uid) { showToast('This is your own post!','info'); return; }
+  const myId   = currentUser.uid;
+  const myName = currentUser.displayName || currentUser.email;
+  const chatId = [myId, ownerId].sort().join('_');
+  try {
+    const ref  = db.collection('chats').doc(chatId);
+    const snap = await ref.get();
+    if (!snap.exists) {
+      await ref.set({ participants:[myId,ownerId], participantNames:{[myId]:myName,[ownerId]:ownerName}, postTitle, lastMsg:'', lastTs:firebase.firestore.FieldValue.serverTimestamp() });
+    }
+    closeModal('detailModal');
+    openModal('chatPanel');
+    document.getElementById('chatListSection').style.display = 'none';
+    document.getElementById('chatViewSection').style.display = 'flex';
+    openChat(chatId, ownerId, ownerName);
+    showToast('Chat opened with ' + ownerName, 'success');
+  } catch(e) { showToast('Could not open chat', 'error'); }
+}
+
+/* ══ MODAL HELPERS ══ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+function closeOnOverlay(e, id) { if (e.target.id === id) closeModal(id); }
+
+/* ══ TOAST ══ */
+function showToast(msg, type='info') {
+  const wrap = document.getElementById('toastWrap');
+  const t    = document.createElement('div');
+  t.className = `toast toast-${type}`; t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(() => { t.classList.add('removing'); setTimeout(() => t.remove(), 300); }, 3500);
+}
+
+/* ══ NOTIFICATIONS SEND ══ */
+function sendNotification(userId, message, postId='') {
+  if (!userId) return;
+  db.collection('notifications').add({ userId, message, postId, read:false, ts:firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+  const cnt = document.getElementById('notifCount');
+  if (cnt && currentUser?.uid === userId) { cnt.style.display='flex'; cnt.textContent = parseInt(cnt.textContent||0)+1; }
+}
+
+/* ══ HELPERS ══ */
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+function formatTimeAgo(date) {
+  if (!date) return 'Just now';
+  const diff = Math.floor((new Date() - date) / 1000);
+  if (diff < 60) return 'Just now';
+  if (diff < 3600) return `${Math.floor(diff/60)} min ago`;
+  if (diff < 86400) return `${Math.floor(diff/3600)} hr ago`;
+  return `${Math.floor(diff/86400)} days ago`;
+}
+function getDaysLeft(p) {
+  const created = p.createdAt?.toDate?.() || new Date();
+  const expires = new Date(created); expires.setDate(expires.getDate()+14);
+  return Math.max(0, Math.ceil((expires - new Date()) / 86400000));
+}
+
+/* ══ MY POSTS ══ */
+function showMyLost() {
+  if (!currentUser) { openModal('authModal'); showToast('Sign in to see your posts','info'); return; }
+  const myLost = allPosts.filter(p => p.userId === currentUser.uid && p.type === 'lost');
+  if (myLost.length === 0) { showToast('You have no lost posts yet','info'); return; }
+  document.getElementById('postCount').textContent = myLost.length;
+  renderCards(myLost,'');
+  document.getElementById('cardsGrid').scrollIntoView({ behavior:'smooth' });
+  showToast(`Showing your ${myLost.length} lost post(s)`,'info');
+}
+function showMyFound() {
+  if (!currentUser) { openModal('authModal'); showToast('Sign in to see your posts','info'); return; }
+  const myFound = allPosts.filter(p => p.userId === currentUser.uid && p.type === 'found');
+  if (myFound.length === 0) { showToast('You have no found posts yet','info'); return; }
+  document.getElementById('postCount').textContent = myFound.length;
+  renderCards(myFound,'');
+  document.getElementById('cardsGrid').scrollIntoView({ behavior:'smooth' });
+  showToast(`Showing your ${myFound.length} found post(s)`,'info');
+}
+
+/* ══ MOBILE MENU ══ */
+function toggleMobileMenu() {
+  const drawer  = document.getElementById('mobileDrawer');
+  const overlay = document.getElementById('drawerOverlay');
+  const isOpen  = drawer.style.transform === 'translateX(0px)';
+  drawer.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0px)';
+  overlay.style.display  = isOpen ? 'none' : 'block';
+}
+function closeMobileMenu() {
+  document.getElementById('mobileDrawer').style.transform = 'translateX(100%)';
+  document.getElementById('drawerOverlay').style.display  = 'none';
+}
+
+/* ══ DARK MODE ══ */
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  localStorage.setItem('darkMode', isDark?'true':'false');
+  showToast(isDark?'🌙 Dark mode on':'☀️ Light mode on','info');
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderTrending();
+  loadPosts();
+  document.getElementById('postDate').value = new Date().toISOString().split('T')[0];
+  if (localStorage.getItem('darkMode') === 'true') document.body.classList.add('dark');
+});
+</script>
+</body>
+</html>
