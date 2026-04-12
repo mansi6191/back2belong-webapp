@@ -7,8 +7,8 @@ report lost items and reconnect with belongings.
 https://back2belong.web.app
 
 ## 👥 Team
-- Mansi Vaishya(mansi6191) — Frontend, UI/UX, Firebase
-- Riya Singh(ishanriya) — Database, Testing, Documentation
+- Mansi Vaishya(mansi6191)
+- Riya Singh(ishanriya)
 
 ## ✨ Features
 - 🔐 Login with Email or Google
