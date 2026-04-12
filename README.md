@@ -60,16 +60,16 @@ Back2Belong provides a centralized digital platform where users can:
 ## 📸 Screenshots
 
 ### 🏠 Home Page
-[Home](home.png)
+[Home](./images/home.png)
 
 ### ➕ Add Item
-[Add Item](add.png)
+[Add Item](./images/add.png)
 
 ### 💬 Chat System(Contact)
-[Chat](contact.png)
+[Chat](./images/contact.png)
 
 ### 🔐 Sign in
-[Sign-in](sign-in.png)
+[Sign-in](s./images/sign-in.png)
 
 ## 🛠️ Tech Stack
 
