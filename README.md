@@ -71,6 +71,18 @@ Back2Belong provides a centralized digital platform where users can:
 ### 🔐 Sign in
 [Sign-in](s./images/sign-in.png)
 
+---
+## 🎥 Demo Video
+
+[Watch Demo](https://1drv.ms/u/c/7efdc94e40c65bf1/IQCgsB2qx-EAQ6cVbQHtSM-6AbzvStk5m3laf4LvJJ1FFUQ?e=Hfk9bo)
+
+---
+## 📊 Presentation
+
+[View PPT](https://1drv.ms/p/c/7efdc94e40c65bf1/IQAM6EdljJsVSLoVjKCCXQt3AXMQC9w3HZQUf4CAnKS8TO0?e=E0opij&nav=eyJzSWQiOjI1Nn0)
+
+---
+
 ## 🛠️ Tech Stack
 
 **Frontend:**
