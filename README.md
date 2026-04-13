@@ -3,6 +3,11 @@
 Back2Belong is a real-time web application designed to help students and staff report, discover, and recover lost items efficiently within a campus environment.
 
 🌐 **Live Demo:** https://back2belong.web.app/
+🎥 Demo Video
+[Watch Demo](https://drive.google.com/file/d/1tVu6IC7ITCJqz0SuGA_V1flcFBGO3lE-/view?usp=drive_link)
+
+📊 Presentation
+[View PPT](https://1drv.ms/p/c/7efdc94e40c65bf1/IQAM6EdljJsVSLoVjKCCXQt3AXMQC9w3HZQUf4CAnKS8TO0?e=E0opij&nav=eyJzSWQiOjI1Nn0)
 
 ---
 
@@ -70,16 +75,6 @@ Back2Belong provides a centralized digital platform where users can:
 
 ### 🔐 Sign in
 [Sign-in](s./images/sign-in.png)
-
----
-## 🎥 Demo Video
-
-[Watch Demo](https://1drv.ms/u/c/7efdc94e40c65bf1/IQCgsB2qx-EAQ6cVbQHtSM-6AbzvStk5m3laf4LvJJ1FFUQ?e=Hfk9bo)
-
----
-## 📊 Presentation
-
-[View PPT](https://1drv.ms/p/c/7efdc94e40c65bf1/IQAM6EdljJsVSLoVjKCCXQt3AXMQC9w3HZQUf4CAnKS8TO0?e=E0opij&nav=eyJzSWQiOjI1Nn0)
 
 ---
 
